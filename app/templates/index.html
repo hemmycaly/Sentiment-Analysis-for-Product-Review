@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Sentiment Analyzer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            resize: none;
+        }
+        #submit-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 0 auto;
+        }
+        #submit-btn:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+        }
+        .aspect-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .aspect-list li {
+            margin-bottom: 5px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Review Sentiment Analyzer</h1>
+        <form id="reviewForm">
+            <div class="form-group">
+                <label for="review">Enter Review:</label>
+                <textarea id="review" name="review" rows="4" class="form-control"></textarea>
+            </div>
+            <button type="submit" id="submit-btn" class="btn btn-primary">Analyze Sentiment</button>
+        </form>
+        <div id="result">
+            <!-- Results will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('#reviewForm').on('submit', function(event){
+                event.preventDefault();
+                var review = $('#review').val();
+                $.ajax({
+                    url: '/predict',
+                    method: 'POST',
+                    data: { review: review },
+                    success: function(response){
+                        var resultHtml = '<h3>Overall Sentiment: ' + response.overall_sentiment + '</h3>';
+                        resultHtml += '<h4>Aspect Sentiments:</h4><ul class="aspect-list">';
+                        for (var aspect in response.aspects) {
+                            resultHtml += '<li>' + aspect + ': ' + response.aspects[aspect] + '</li>';
+                        }
+                        resultHtml += '</ul>';
+                        $('#result').html(resultHtml);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
